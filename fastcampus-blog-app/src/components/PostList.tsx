@@ -17,7 +17,9 @@ export interface PostProps {
     email: string;
     summary: string;
     content: string;
-    createAt: string;
+    createdAt: string;
+    updatedAt?: string;
+    uid: string;
 }
 
 export default function PostList({ hasNavigation = true }: PostListProps) {
@@ -45,13 +47,13 @@ export default function PostList({ hasNavigation = true }: PostListProps) {
         <>
             {hasNavigation && (
                 <div className="post__navigation">
-                    <div 
-                        role="presentation" 
+                    <div
+                        role="presentation"
                         onClick={() => setActiveTab("all")}
                         className={activeTab === "all" ? "post__navigation--active" : ""}>
                         전체
                     </div>
-                    <div 
+                    <div
                         role="presentation"
                         onClick={() => setActiveTab("my")}
                         className={activeTab === "my" ? "post__navigation--active" : ""}>
@@ -59,33 +61,33 @@ export default function PostList({ hasNavigation = true }: PostListProps) {
                     </div>
                 </div>
             )}
-            
+
             <div className="post__list">
-                {posts?.length > 0 ? posts?.map((posts, index) => (
-                    <div key={posts?.id} className="post__box">
-                        <Link to={`/posts/${posts?.id}`}>
+                {posts?.length > 0 ? posts?.map((post, index) => (
+                    <div key={post?.id} className="post__box">
+                        <Link to={`/posts/${post?.id}`}>
                             <div className="post__profile-box">
                                 <div className="post__profile" />
-                                <div className="post__author-name">{posts?.email}</div>
-                                <div className="post__date">{posts?.createAt}</div>
+                                <div className="post__author-name">{post?.email}</div>
+                                <div className="post__date">{post?.createdAt}</div>
                             </div>
-                            <div className="post__title">{posts?.title}</div>
-                            <div className="post__text">{posts?.summary}</div>
+                            <div className="post__title">{post?.title}</div>
+                            <div className="post__text">{post?.summary}</div>
                         </Link>
-                        {posts?.email === user?.email && (
-                        <div className="post__utils-box">
-                            <div className="post__delete">삭제</div>
-                            {/* <div className="post__edit">수정</div> */}
-                            <Link to={`/posts/edit/${'post?.id'}`} className="post__edit">
-                                수정
-                            </Link>
-                        </div>
+                        {post?.email === user?.email && (
+                            <div className="post__utils-box">
+                                <div className="post__delete">삭제</div>
+                                {/* <div className="post__edit">수정</div> */}
+                                <Link to={`/posts/edit/${post?.id}`} className="post__edit">
+                                    수정
+                                </Link>
+                            </div>
                         )}
-                    </div> 
+                    </div>
                 ))
-            : (
-                <div className="post__no-post">게시글이 없습니다.</div>
-            )}
+                    : (
+                        <div className="post__no-post">게시글이 없습니다.</div>
+                    )}
             </div>
         </>
     );

@@ -10,8 +10,8 @@ export default function PostDetail() {
     const params = useParams();
     // console.log(params?.id);
 
-    const getPost = async(id: string) => {
-        if(id) {
+    const getPost = async (id: string) => {
+        if (id) {
             const docRef = doc(db, "posts", id);
             const docSnap = await getDoc(docRef);
             // console.log(docSnap?.data());
@@ -37,11 +37,11 @@ export default function PostDetail() {
                         <div className="post__profile-box">
                             <div className="post__profile" />
                             <div className="post__author-name">{post?.email}</div>
-                            <div className="post__date">{post?.createAt}</div>
+                            <div className="post__date">{post?.createdAt}</div>
                         </div>
                         <div className="post__title"></div>
                         <div className="post__utils-box">
-                            <div 
+                            <div
                                 className="post__delete"
                                 role="presentation"
                                 onClick={handleDelete}
@@ -49,7 +49,7 @@ export default function PostDetail() {
                                 삭제
                             </div>
                             <div className="post__edit">
-                                <Link to={`/posts/edit/1`}>수정</Link>
+                                <Link to={`/posts/edit/${post?.id}`}>수정</Link>
                             </div>
                         </div>
                         <div className="post__text post__text--pre-wrap">
