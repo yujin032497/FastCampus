@@ -1,21 +1,32 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { PostProps } from "./PostList";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { db } from "firebaseApp";
+import AuthContext from "context/AuthContext";
+import { toast } from "react-toastify";
 
 const COMMENTS = [
-  {id: 1, email: "test@test.com", content: "댓글입니다 1", createdAt: "2023-06-13"},
-  {id: 2, email: "test@test.com", content: "댓글입니다 2", createdAt: "2023-06-13"},
-  {id: 3, email: "test@test.com", content: "댓글입니다 3", createdAt: "2023-06-13"},
-  {id: 4, email: "test@test.com", content: "댓글입니다 4", createdAt: "2023-06-13"},
-  {id: 5, email: "test@test.com", content: "댓글입니다 5", createdAt: "2023-06-13"},
-  {id: 6, email: "test@test.com", content: "댓글입니다 6", createdAt: "2023-06-13"},
-  {id: 7, email: "test@test.com", content: "댓글입니다 7", createdAt: "2023-06-13"},
+  { id: 1, email: "test@test.com", content: "댓글입니다 1", createdAt: "2023-06-13" },
+  { id: 2, email: "test@test.com", content: "댓글입니다 2", createdAt: "2023-06-13" },
+  { id: 3, email: "test@test.com", content: "댓글입니다 3", createdAt: "2023-06-13" },
+  { id: 4, email: "test@test.com", content: "댓글입니다 4", createdAt: "2023-06-13" },
+  { id: 5, email: "test@test.com", content: "댓글입니다 5", createdAt: "2023-06-13" },
+  { id: 6, email: "test@test.com", content: "댓글입니다 6", createdAt: "2023-06-13" },
+  { id: 7, email: "test@test.com", content: "댓글입니다 7", createdAt: "2023-06-13" },
 ]
 
-export default function Comments() {
+interface CommentsProps {
+  post: PostProps;
+}
+
+export default function Comments({ post }: CommentsProps) {
   const [comment, setComment] = useState("");
+  const { user } = useContext(AuthContext);
+  // console.log(post);
 
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const {
-      target: {name, value},
+      target: { name, value },
     } = e;
 
     if (name === "comment") {
@@ -23,18 +34,54 @@ export default function Comments() {
     }
   };
 
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      if (post && post?.id) {
+        const postRef = doc(db, "posts", post.id);
+        if (user?.uid) {
+          const commentObj = {
+            content: comment,
+            uid: user.uid,
+            email: user.email,
+            createdAt: new Date()?.toLocaleDateString("ko", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            }),
+          };
+
+          await updateDoc(postRef, {
+            comments: arrayUnion(commentObj),
+            updatedAt: new Date()?.toLocaleDateString("ko", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            }),
+          });
+        }
+      }
+      toast.success("댓글을 생성했습니다.");
+      setComment("");
+    } catch (e: any) {
+      console.log(e);
+      toast.error(e?.code);
+    }
+  };
+
   return (
     <div className="comments">
-      <form className="comments__form">
+      <form className="comments__form" onSubmit={onSubmit}>
         <div className="form__block">
-            <label htmlFor="comment">댓글 입력</label>
-            <textarea 
-              name="comment" 
-              id="comment" 
-              required 
-              value={comment} 
-              onChange={onChange}
-            />
+          <label htmlFor="comment">댓글 입력</label>
+          <textarea
+            name="comment"
+            id="comment"
+            required
+            value={comment}
+            onChange={onChange}
+          />
         </div>
         <div className="form__block form__block-reverse">
           <input type="submit" value="입력" className="form__btn-submit" />
